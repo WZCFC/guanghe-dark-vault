@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f4e8">
+  <meta name="description" content="光核玩家社区实践活动。搜集箱签线索，暗标竞价，再决定继续搜仓还是带货撤离。">
+  <title>暗仓竞拍 · 光核实践活动</title>
+  <link rel="icon" href="data:,">
+  <script>
+    (() => {
+      const key = 'guanghe-dark-vault-theme';
+      const root = document.documentElement;
+      const browserBar = document.querySelector('meta[name="theme-color"]');
+      let buttons = [];
+
+      function applyTheme(value) {
+        const theme = value === 'dark' ? 'dark' : 'light';
+        root.dataset.theme = theme;
+        browserBar.content = theme === 'dark' ? '#101c18' : '#f7f4e8';
+        for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.mode === theme));
+      }
+
+      try { applyTheme(localStorage.getItem(key)); } catch { /* The in-page switch still works. */ }
+      document.addEventListener('DOMContentLoaded', () => {
+        buttons = Array.from(document.querySelectorAll('.theme-switch button'));
+        applyTheme(root.dataset.theme);
+        for (const button of buttons) {
+          button.addEventListener('click', () => {
+            const { mode } = button.dataset;
+            applyTheme(mode);
+            try { localStorage.setItem(key, mode); } catch { /* Keep the active theme for this page. */ }
+          });
+        }
+        window.addEventListener('storage', event => {
+          if (event.key === key || event.key === null) applyTheme(event.newValue);
+        });
+      });
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css?v=24">
+  <script src="game.js?v=18" defer></script>
+  <script src="views.js?v=24" defer></script>
+  <script src="guide.js?v=21" defer></script>
+  <script src="sound.js?v=25" defer></script>
+  <script src="feedback-fx.js?v=25" defer></script>
+  <script src="app.js?v=25" defer></script>
+  <script src="welcome.js?v=24" defer></script>
+  <script src="community.js?v=20" defer></script>
+  <script src="online.js?v=24" defer></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">跳转到主要内容</a>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="https://guanghe.qq.com/" target="_blank" rel="noopener noreferrer" data-community-official aria-label="访问光核玩家社区官网（新标签页）">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span><strong>光核</strong><small>玩家社区</small></span>
+      </a>
+      <nav class="top-nav" aria-label="活动导航">
+        <a href="#home" data-nav="home" aria-current="page">首页</a>
+        <a href="#arena" data-nav="arena">竞拍台</a>
+        <a href="#collection" data-nav="collection">收藏室</a>
+        <a href="#supply" data-nav="supply" id="supply-nav"><span class="supply-nav-label">补给<span class="supply-dot" id="supply-dot" hidden aria-hidden="true"></span></span></a>
+        <a href="#slots" data-nav="slots" class="slots-link"><span>老虎机</span></a>
+        <a href="#shop" data-nav="shop">商店</a>
+        <a href="#community" data-nav="community">交流站</a>
+        <a href="#account" data-nav="account" id="account-link">登录</a>
+      </nav>
+      <div class="topbar-actions">
+        <div class="theme-switch" role="group" aria-label="页面主题">
+          <button type="button" data-mode="light" aria-pressed="true">浅色</button>
+          <button type="button" data-mode="dark" aria-pressed="false">深色</button>
+        </div>
+        <a href="#shop" data-nav="shop" class="wallet" aria-label="查看光核币商店">
+          <span class="coin" aria-hidden="true"></span><strong id="wallet-count">0</strong><span>光核币</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="shell">
+    <section id="home" tabindex="-1" aria-labelledby="hero-title">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="signal" aria-hidden="true"></span>光核玩家社区</p>
+          <h1 id="hero-title" data-help-topic="home">暗仓<span>竞拍</span></h1>
+          <div class="hero-actions">
+            <button type="button" class="button primary" data-action="choose-scenario">单人开拍</button>
+            <a class="button subtle" href="#online" data-nav="online">真人竞拍</a>
+            <a class="text-button" href="#community" data-nav="community">战报讨论</a>
+            <a class="text-button" href="#tutorial" data-nav="tutorial">新手教程</a>
+            <button data-sound-toggle class="button subtle small" type="button" aria-pressed="false" hidden>开启声音</button>
+          </div>
+        </div>
+        <figure class="hero-illustration">
+          <picture>
+            <source media="(max-width: 680px)" srcset="assets/warehouse-mobile.webp?v=3">
+            <img src="assets/warehouse.webp?v=3" alt="带封签的货箱停在仓库检视区" width="860" height="573" fetchpriority="high">
+          </picture>
+          <figcaption>竞拍拍品示意</figcaption>
+        </figure>
+      </div>
+      <div id="scenario-section" class="scenario-section" aria-labelledby="scenario-heading">
+        <div class="section-head">
+          <h2 id="scenario-heading" tabindex="-1" data-help-topic="scenarios">竞拍场景</h2>
+        </div>
+        <div id="scenario-grid"></div>
+      </div>
+      <section class="home-activity" aria-labelledby="home-activity-title">
+        <div class="section-head"><h2 id="home-activity-title" data-help-topic="activity">光核活动</h2><button type="button" class="button primary small" data-action="hub" data-hub="activity">打开活动中心</button></div>
+        <div class="activity-grid" id="activity-progress"></div>
+        <div class="activity-links">
+          <a class="button subtle small" href="#community" data-nav="community">网页讨论</a>
+          <button type="button" class="button subtle small" data-action="hub" data-hub="ranking">个人排行</button>
+          <a class="button subtle small" href="#feedback" data-nav="feedback">体验问卷</a>
+        </div>
+        <p id="activity-save-warning" class="form-note" hidden>浏览器存档不可用，进度只在当前页面保留。</p>
+      </section>
+    </section>
+
+      <section class="section play-guide" id="rules" hidden tabindex="-1" aria-labelledby="flow-heading">
+        <div class="section-head">
+          <h1 id="flow-heading" data-help-topic="rules">参加规则</h1>
+          <span class="entry-summary">单人 · 最多 5 轮 · 上限 6 分钟</span>
+        </div>
+        <div class="rules-spread">
+        <div class="rules-sheet">
+          <div class="rules-sheet-head"><h3>一局怎么玩</h3><button type="button" class="text-button section-link" data-action="rules">完整规则 <span aria-hidden="true">↗</span></button></div>
+        <ol class="steps">
+          <li>
+            <span class="step-icon"><i data-icon="scan" aria-hidden="true"></i></span>
+            <div><h4>查勘货箱</h4><p>每局可扫描两次，查看物件占格、品质和估价。</p></div>
+          </li>
+          <li>
+            <span class="step-icon"><i data-icon="bid" aria-hidden="true"></i></span>
+            <div><h4>整箱暗拍</h4><p>按场景发放局内筹码。每箱出价一次，竞得才扣款。</p></div>
+          </li>
+          <li>
+            <span class="step-icon"><i data-icon="exit" aria-hidden="true"></i></span>
+            <div><h4>择机撤离</h4><p>第 4、5 轮高品质物件更常见。持货闯关若遭扣留，结算时返还该箱约 70% 的估值。</p></div>
+          </li>
+        </ol>
+        </div>
+        <div class="reward-sheet">
+          <h3>参与与奖励</h3>
+          <dl class="entry-terms">
+            <div><dt>开局</dt><dd>卸货站免费。其余场景按标价扣除光核币，提供更多局内筹码，更易遇到红色品质物件，持货盘查风险也更高。</dd></div>
+            <div><dt>保底</dt><dd>完成至少 3 轮，有一次出价达到起拍价 +10 筹码并结算。每天前 2 场有效对局分别发 40、20 光核币，空手或亏损也适用。</dd></div>
+            <div><dt>补给</dt><dd>签到、分享战报和参与里程碑提供额外光核币或护运签。</dd></div>
+          </dl>
+          <a class="text-button section-link" href="#supply" data-nav="supply">查看补给与里程碑 <span aria-hidden="true">↘</span></a>
+        </div>
+        </div>
+        <div class="page-actions"><a class="button primary" href="#arena" data-nav="arena">前往竞拍台 <span aria-hidden="true">→</span></a></div>
+      </section>
+
+      <section class="section arena" id="arena" hidden tabindex="-1" aria-labelledby="arena-heading">
+        <div class="section-head"><h1 id="arena-heading" data-help-topic="arena">竞拍台</h1>
+          <div class="play-section-actions"><a class="text-button section-link" href="#tutorial" data-nav="tutorial">新手教程</a>
+            <button data-sound-toggle class="button subtle small" type="button" aria-pressed="false" hidden>开启声音</button></div>
+        </div>
+        <div id="arena-lobby" class="arena-lobby">
+          <h3>准备接收货箱</h3>
+          <div class="lobby-controls"><button type="button" class="button primary" data-action="choose-scenario">选择竞拍场景 <span aria-hidden="true">→</span></button>
+            <a class="button subtle" href="#online" data-nav="online">线上组队</a></div>
+        </div>
+        <div id="arena-screen"></div>
+      </section>
+
+      <section id="online" class="section" hidden tabindex="-1" aria-labelledby="online-heading">
+        <div class="section-head">
+          <h1 id="online-heading" data-help-topic="online">线上组队</h1>
+          <div class="play-section-actions"><a class="text-button section-link" href="#arena" data-nav="arena">单人竞拍</a>
+            <button data-sound-toggle class="button subtle small" type="button" aria-pressed="false" hidden>开启声音</button></div>
+        </div>
+        <div id="online-board"></div>
+        <p id="online-status" class="online-status" role="status"></p>
+      </section>
+
+      <section class="section collection" id="collection" hidden tabindex="-1" aria-labelledby="collection-heading">
+        <div class="section-head">
+          <h1 id="collection-heading" data-help-topic="collection">收藏室</h1>
+          <span class="collection-count" id="collection-count" aria-live="polite"></span>
+        </div>
+        <div class="collection-filters" role="group" aria-label="筛选收藏">
+          <button type="button" data-action="filter-collection" data-filter="all" aria-pressed="true" aria-controls="collection-shelf">全部</button>
+          <button type="button" data-action="filter-collection" data-filter="owned" aria-pressed="false" aria-controls="collection-shelf">已解锁</button>
+          <button type="button" data-action="filter-collection" data-filter="locked" aria-pressed="false" aria-controls="collection-shelf">未解锁</button>
+          <select id="collection-grade" aria-label="筛选藏品品质" aria-controls="collection-shelf">
+            <option value="all">全部品质</option><option value="white">白色</option><option value="green">绿色</option><option value="blue">蓝色</option>
+            <option value="purple">紫色</option><option value="orange">橙色</option><option value="red">红色</option>
+          </select>
+        </div>
+        <div id="collection-shelf"></div>
+      </section>
+
+      <section id="supply" class="section" hidden tabindex="-1" aria-labelledby="supply-heading">
+        <div class="section-head">
+          <h1 id="supply-heading" data-help-topic="supply">活动补给</h1>
+          <a class="text-button section-link" href="#shop" data-nav="shop">去光核币商店 <span aria-hidden="true">↘</span></a>
+        </div>
+        <div class="supply-features">
+          <a class="afk-entry panel" href="#afk" data-nav="afk">
+            <span><strong>离线补给</strong><span class="afk-entry-detail">关页后也会累计光核币</span></span>
+            <span class="afk-entry-next"><span id="afk-preview"></span><span aria-hidden="true">→</span></span>
+          </a>
+          <a class="panel slots-entry" href="#slots" data-nav="slots">
+            <span class="slots-entry-reels" aria-hidden="true"><span data-symbol="coin"><i class="slot-icon"></i></span><span data-symbol="rare"><i class="slot-icon"></i></span><span data-symbol="permit"><i class="slot-icon"></i></span></span>
+            <span class="slots-entry-copy"><strong>仓库老虎机</strong><span id="slot-entry-cost"></span><span class="afk-entry-detail">光核币、稀有藏品和护运签</span></span>
+          </a>
+        </div>
+        <div class="supply-layout">
+          <article class="panel" aria-labelledby="task-heading">
+            <div class="panel-head"><h3 id="task-heading" data-help-topic="activity">活动任务</h3></div>
+            <div id="task-list"></div>
+          </article>
+          <article class="panel milestone-panel" aria-labelledby="milestone-heading">
+            <div class="panel-head"><h3 id="milestone-heading" data-help-topic="milestones">参与里程碑</h3><span class="annot" id="eligible-label"></span></div>
+            <div id="milestone-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="afk" class="section afk-page" hidden tabindex="-1" aria-labelledby="afk-heading">
+        <div class="section-head">
+          <h1 id="afk-heading" data-help-topic="afk">离线补给</h1>
+          <p id="afk-storage-note" hidden>浏览器存档不可用，收益仅在当前页面累计。</p>
+          <a class="text-button section-link" href="#supply" data-nav="supply">返回补给</a>
+        </div>
+        <article class="panel afk-tray" aria-label="待领取补给">
+          <div class="afk-ledger">
+            <span class="afk-label">本次可领取</span>
+            <p class="afk-total"><strong class="mono" id="afk-amount">0</strong> 光核币</p>
+            <p id="afk-extra" class="afk-extra" hidden></p>
+            <progress id="afk-meter" aria-label="离线补给累积进度" max="48" value="0"></progress>
+            <p id="afk-stock" class="afk-timer"></p>
+            <p id="afk-status" class="afk-timer"></p>
+          </div>
+          <div class="afk-claim">
+            <button type="button" class="button primary" data-action="claim-afk" id="afk-claim" disabled>领取补给</button>
+            <a class="text-button section-link" href="#shop" data-nav="shop">去光核币商店 <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <dl class="afk-terms">
+          <div><dt>积累速度</dt><dd id="afk-rate"></dd></div>
+          <div><dt>存放上限</dt><dd id="afk-cap"></dd></div>
+          <div><dt>今日基础领取</dt><dd id="afk-daily"></dd></div>
+          <div><dt>累计基础领取</dt><dd id="afk-earned"></dd></div>
+        </dl>
+        <article class="panel afk-growth" aria-labelledby="afk-rank">
+          <div>
+            <div class="afk-growth-head"><span class="shop-category mono" id="afk-level"></span><h2 id="afk-rank"></h2></div>
+            <p id="afk-level-label"></p>
+            <progress id="afk-level-meter" aria-label="补给站升级进度" max="1" value="0"></progress>
+            <p id="afk-bonus-today"></p>
+          </div>
+          <div>
+            <h2>补给刮刮卡</h2>
+            <p id="afk-card-label"></p>
+            <progress id="afk-card-meter" aria-label="下张刮刮卡领取进度" max="1" value="0"></progress>
+            <a id="afk-open-cards" class="text-button section-link" href="#shop" data-nav="shop" hidden></a>
+          </div>
+        </article>
+      </section>
+
+      <section id="slots" class="section" hidden tabindex="-1" aria-labelledby="slots-heading">
+        <div class="section-head">
+          <h1 id="slots-heading" data-help-topic="slots">仓库老虎机</h1>
+          <div class="play-section-actions"><a class="text-button section-link" href="#supply" data-nav="supply">返回补给</a>
+            <button data-sound-toggle class="button subtle small" type="button" aria-pressed="false" hidden>开启声音</button></div>
+        </div>
+        <div id="slots-machine"></div>
+      </section>
+
+      <section id="shop" class="section" hidden tabindex="-1" aria-labelledby="shop-heading">
+        <div class="section-head">
+          <h1 id="shop-heading" data-help-topic="shop">光核币商店</h1>
+          <span class="collection-count" id="shop-balance" aria-live="polite"></span>
+        </div>
+        <div id="shop-scratch"></div>
+        <div id="shop-items"></div>
+      </section>
+
+      <section id="community" class="section" hidden tabindex="-1" aria-labelledby="community-heading">
+        <div class="section-head">
+          <h1 id="community-heading" data-help-topic="community">光核交流站</h1>
+        </div>
+        <div id="battle-discussions"></div>
+        <div class="community-grid">
+          <article class="panel topic-panel" aria-labelledby="topics-heading">
+            <div class="panel-head"><h3 id="topics-heading" data-help-topic="discussion">策略话题</h3></div>
+            <div class="topic-list" id="topics"></div>
+            <div class="community-foot">
+              <a href="https://guanghe.qq.com/" target="_blank" rel="noopener noreferrer" data-community-official aria-label="前往光核玩家社区官网（新标签页）">前往光核玩家社区官网 <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article class="panel" aria-labelledby="reports-heading">
+            <div class="panel-head"><h3 id="reports-heading">我的撤离战报</h3><span class="annot">最近对局</span></div>
+            <div id="my-reports"></div>
+          </article>
+        </div>
+      </section>
+      <section id="tutorial" class="section" hidden tabindex="-1" aria-labelledby="tutorial-heading">
+        <div class="section-head"><h1 id="tutorial-heading">新手教程</h1><a class="text-button section-link" href="#rules" data-nav="rules">完整规则</a></div>
+        <div id="practice-game"></div>
+        <div id="play-handbook" class="panel handbook"></div>
+      </section>
+
+      <section id="account" class="section" hidden tabindex="-1" aria-labelledby="account-heading">
+        <div class="section-head"><h1 id="account-heading">账号存档</h1><span id="save-scope" class="collection-count">游客存档</span></div>
+        <article class="panel account-panel">
+          <div id="account-guest">
+            <p>用同一账号可以在不同浏览器续玩。账号与这个浏览器的游客档各自保存。</p>
+            <form id="account-form" class="discussion-form">
+              <label for="account-name">用户名</label>
+              <input id="account-name" name="username" minlength="2" maxlength="24" autocomplete="username" required>
+              <label for="account-password">密码</label>
+              <input id="account-password" name="password" type="password" minlength="8" maxlength="80" autocomplete="current-password" required>
+              <p class="form-note">用户名 2–24 位，密码至少 8 位。注册只需这两项。</p>
+              <div class="discussion-actions"><button type="submit" class="button primary" name="account-action" value="login">登录</button>
+                <button type="submit" class="button subtle" name="account-action" value="register">注册并登录</button></div>
+            </form>
+          </div>
+          <div id="account-signed-in" hidden>
+            <p>已登录 <strong id="account-username"></strong></p>
+            <p>游玩进度会保存到账号，离线补给关页后继续累计。</p>
+            <div class="discussion-actions"><a class="button primary" href="#arena" data-nav="arena">回竞拍台</a>
+              <a class="button subtle" href="#afk" data-nav="afk">查看离线补给</a><button class="button subtle" type="button" id="account-logout">退出登录</button></div>
+          </div>
+          <p id="account-status" role="status"></p>
+        </article>
+      </section>
+
+      <section id="feedback" class="section" hidden tabindex="-1" aria-labelledby="feedback-heading">
+        <div class="section-head"><h1 id="feedback-heading">体验问卷</h1></div>
+        <article class="panel survey-panel">
+          <form id="experience-survey" class="discussion-form">
+            <fieldset><legend>这次玩得怎么样？</legend><div class="survey-rating">
+              <label><input type="radio" name="rating" value="1" required>1</label><label><input type="radio" name="rating" value="2">2</label>
+              <label><input type="radio" name="rating" value="3">3</label><label><input type="radio" name="rating" value="4">4</label>
+              <label><input type="radio" name="rating" value="5">5</label>
+            </div><p class="form-note">1 不满意，5 很满意</p></fieldset>
+            <label for="survey-friction">哪一步最容易卡住？</label>
+            <select id="survey-friction" name="friction" required>
+              <option value="">选择一个环节</option><option>入场与币</option><option>扫描与估价</option><option>出价与揭标</option>
+              <option>撤离与结算</option><option>补给与其他功能</option><option>没有卡住</option>
+            </select>
+            <label for="survey-note">最想我们改什么？（选填）</label>
+            <textarea id="survey-note" name="note" rows="3" maxlength="500"></textarea>
+            <div><button type="submit" class="button primary">提交反馈</button></div>
+            <p id="survey-status" role="status"></p>
+          </form>
+          <figure class="survey-code"><img src="assets/experience-survey.png" width="360" height="360" loading="lazy" alt="暗仓竞拍体验问卷二维码">
+            <figcaption>可在本页填写，也可用另一台设备扫码填写。</figcaption></figure>
+        </article>
+      </section>
+    <noscript><p class="panel-inset">启用浏览器 JavaScript 后即可开始竞拍。</p></noscript>
+  </main>
+
+  <dialog id="dialog" aria-labelledby="dialog-title" aria-modal="true">
+    <header class="dialog-head"><h2 id="dialog-title"></h2><button type="button" class="icon-button" data-action="close-dialog" aria-label="关闭">×</button></header>
+    <div id="dialog-content" class="dialog-content"></div>
+  </dialog>
+  <div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
+  <aside id="survey-nudge" class="panel survey-nudge" aria-label="体验问卷提醒" hidden>
+    <p>刚才那局，有哪一步不太好懂？</p>
+    <a class="button primary small" href="#feedback" data-nav="feedback">填体验问卷</a>
+    <button class="button subtle small" id="survey-later" type="button">稍后</button>
+  </aside>
+</body>
+</html>
