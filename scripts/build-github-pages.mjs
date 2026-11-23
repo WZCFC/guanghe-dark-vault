@@ -1,11 +1,12 @@
 import { access, cp, readFile, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 const source = resolve('dist');
 const output = process.argv[2] && resolve(process.argv[2]);
 const full = 'https://guanghe-dark-vault.fc545123.chatgpt.site/';
-if (!output || relative(source, output) === '' || !relative(source, output).startsWith('..')) {
+const fromSource = output && relative(source, output);
+if (!fromSource || !(isAbsolute(fromSource) || fromSource === '..' || fromSource.startsWith('..' + sep))) {
   throw new Error('Pass a fresh output directory outside dist.');
 }
 if (await access(output, constants.F_OK).then(() => true, () => false)) {
@@ -31,7 +32,7 @@ html = replaceRequired(html, '<main id="main" tabindex="-1" class="shell">', `<m
       <span>GitHub 试玩 · 单人进度保存在当前浏览器</span>
       <a class="text-button" href="${full}">完整在线版</a>
     </aside>`);
-html = replaceRequired(html, 'data-nav="account" id="account-link">登录', 'id="account-link">在线账号');
+html = replaceRequired(html, 'data-nav="account" id="account-link">登录', 'id="account-link">账号');
 for (const route of ['online', 'account', 'feedback']) {
   const link = new RegExp(`href="#${route}"(?: data-nav="${route}")?`, 'g');
   html = replaceRequired(html, link, `href="${full}#${route}"`);
