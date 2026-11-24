@@ -223,6 +223,7 @@
         return;
       }
       let visual;
+      let completed = false;
       if (data.left) {
         code = '';
         room = null;
@@ -232,7 +233,7 @@
         room = data;
         code = data.code;
         clockOffset = data.now - Date.now();
-        if (!screen.hidden && room.phase === 'done' && previous?.phase !== 'done') window.DarkVaultSurvey?.remind('online');
+        completed = Boolean(previous && previous.phase !== 'done' && room.phase === 'done');
         if (!screen.hidden) {
           if (room.latest && previous && room.latest.round !== previous.latest?.round) {
             const won = room.latest.winner === room.selfSeat;
@@ -252,6 +253,7 @@
       if (action !== 'status' || status.textContent.startsWith('房间连接')) status.textContent = '';
       draw();
       if (visual) fx.confirm(board.querySelector(visual[0]), ...visual.slice(1));
+      if (completed && !screen.hidden) window.DarkVaultSurvey.remind(board.querySelector('.online-recap'));
     } catch {
       status.textContent = '房间连接中断，请稍后重试。';
     } finally {

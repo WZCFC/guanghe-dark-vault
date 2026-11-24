@@ -33,7 +33,7 @@ html = replaceRequired(html, '<main id="main" tabindex="-1" class="shell">', `<m
       <a class="text-button" href="${full}">完整在线版</a>
     </aside>`);
 html = replaceRequired(html, 'data-nav="account" id="account-link">登录', 'id="account-link">账号');
-for (const route of ['online', 'account', 'feedback']) {
+for (const route of ['online', 'account']) {
   const link = new RegExp(`href="#${route}"(?: data-nav="${route}")?`, 'g');
   html = replaceRequired(html, link, `href="${full}#${route}"`);
 }
@@ -44,8 +44,6 @@ html = replaceRequired(html, '<div id="online-board"></div>',
   `<div id="online-board" class="pages-services"><a class="button primary" href="${full}#online">前往真人竞拍</a></div>`);
 html = replaceRequired(html, '<article class="panel account-panel">',
   `<article class="panel account-panel"><a class="button primary" href="${full}#account">前往在线账号</a>`);
-html = replaceRequired(html, '<article class="panel survey-panel">',
-  `<article class="panel survey-panel"><div class="pages-services"><a class="button primary" href="${full}#feedback">打开在线问卷</a></div>`);
 await writeFile(htmlPath, html);
 
 const appPath = join(output, 'app.js');
@@ -54,11 +52,6 @@ app = replaceRequired(app, 'void syncAccount().then(tick);\n  window.setInterval
   'void tick();\n  window.setInterval(tick, 1000);');
 await writeFile(appPath, app);
 
-const viewsPath = join(output, 'views.js');
-let views = await readFile(viewsPath, 'utf8');
-views = replaceRequired(views, 'href="#feedback" data-nav="feedback"', `href="${full}#feedback"`);
-await writeFile(viewsPath, views);
-
 await writeFile(join(output, 'pages.css'), `
 .pages-services {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
@@ -66,7 +59,7 @@ await writeFile(join(output, 'pages.css'), `
   color: var(--text); background: var(--tinted); border-inline-start: 3px solid var(--blue);
 }
 .pages-services a { color: var(--blue); font-weight: 700; }
-#account-guest, #account-signed-in, #account-status, #save-scope, #experience-survey,
+#account-guest, #account-signed-in, #account-status, #save-scope,
 .battle-hook, [data-action="discuss-report"] { display: none; }
 `);
 await writeFile(join(output, '.nojekyll'), '');

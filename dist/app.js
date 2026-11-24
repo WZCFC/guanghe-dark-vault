@@ -149,9 +149,6 @@
       }
       const changedTurn = turnChanged(oldState, state);
       const newReceipt = oldState.history[0]?.id !== state.history[0]?.id ? state.history[0] : null;
-      if (newReceipt?.rounds > 0) {
-        window.DarkVaultSurvey?.remind('solo');
-      }
       if (!(spinning && result.effect === 'slots-spun') && (result.changed || changedTurn || oldState.wallet !== state.wallet || !canPersist)) renderHome();
       if (oldState.collection.length !== state.collection.length) renderCollection();
       if (screen === 'arena' && (changedTurn || result.effect === 'scanned' || (state.run && oldState.permits !== state.permits))) {
@@ -181,6 +178,7 @@
           cue('collect');
           fx.confirm(gameArea.querySelector('.unlock-display'), 'collect', true);
         } else if (newReceipt?.rounds) fx.confirm(gameArea.querySelector('.settle-head'), 'settled');
+        if (newReceipt?.rounds) window.DarkVaultSurvey.remind(gameArea.querySelector('.settlement'));
       }
       if (result.changed && result.effect !== 'slots-spun' && state.wallet > oldState.wallet) {
         fx.confirm($('#wallet-count'), 'wallet');

@@ -38,16 +38,17 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=26">
   <script src="game.js?v=18" defer></script>
   <script src="views.js?v=24" defer></script>
   <script src="guide.js?v=21" defer></script>
   <script src="sound.js?v=25" defer></script>
   <script src="feedback-fx.js?v=25" defer></script>
-  <script src="app.js?v=25" defer></script>
-  <script src="welcome.js?v=24" defer></script>
+  <script src="survey.js?v=26" defer></script>
+  <script src="app.js?v=26" defer></script>
+  <script src="welcome.js?v=26" defer></script>
   <script src="community.js?v=20" defer></script>
-  <script src="online.js?v=24" defer></script>
+  <script src="online.js?v=26" defer></script>
 </head>
 <body>
   <a href="#main" class="skip-link">跳转到主要内容</a>
@@ -335,24 +336,13 @@
       <section id="feedback" class="section" hidden tabindex="-1" aria-labelledby="feedback-heading">
         <div class="section-head"><h1 id="feedback-heading">体验问卷</h1></div>
         <article class="panel survey-panel">
-          <form id="experience-survey" class="discussion-form">
-            <fieldset><legend>这次玩得怎么样？</legend><div class="survey-rating">
-              <label><input type="radio" name="rating" value="1" required>1</label><label><input type="radio" name="rating" value="2">2</label>
-              <label><input type="radio" name="rating" value="3">3</label><label><input type="radio" name="rating" value="4">4</label>
-              <label><input type="radio" name="rating" value="5">5</label>
-            </div><p class="form-note">1 不满意，5 很满意</p></fieldset>
-            <label for="survey-friction">哪一步最容易卡住？</label>
-            <select id="survey-friction" name="friction" required>
-              <option value="">选择一个环节</option><option>入场与币</option><option>扫描与估价</option><option>出价与揭标</option>
-              <option>撤离与结算</option><option>补给与其他功能</option><option>没有卡住</option>
-            </select>
-            <label for="survey-note">最想我们改什么？（选填）</label>
-            <textarea id="survey-note" name="note" rows="3" maxlength="500"></textarea>
-            <div><button type="submit" class="button primary">提交反馈</button></div>
-            <p id="survey-status" role="status"></p>
-          </form>
-          <figure class="survey-code"><img src="assets/experience-survey.png" width="360" height="360" loading="lazy" alt="暗仓竞拍体验问卷二维码">
-            <figcaption>可在本页填写，也可用另一台设备扫码填写。</figcaption></figure>
+          <div class="survey-copy">
+            <h2>这局玩得怎么样？</h2>
+            <p>告诉我们哪一步最顺手、哪里容易卡住，你的反馈会帮助我们改进暗仓竞拍。</p>
+            <a class="button primary" href="https://v.wjx.cn/vm/Q3eAPsc.aspx" target="_blank" rel="noopener">打开问卷星</a>
+          </div>
+          <figure class="survey-code"><img src="assets/experience-survey.png?v=26" width="281" height="280" loading="lazy" alt="问卷星体验与反馈问卷二维码">
+            <figcaption>电脑可用手机扫码，手机可长按二维码。</figcaption></figure>
         </article>
       </section>
     <noscript><p class="panel-inset">启用浏览器 JavaScript 后即可开始竞拍。</p></noscript>
@@ -363,10 +353,19 @@
     <div id="dialog-content" class="dialog-content"></div>
   </dialog>
   <div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true"></div>
-  <aside id="survey-nudge" class="panel survey-nudge" aria-label="体验问卷提醒" hidden>
-    <p>刚才那局，有哪一步不太好懂？</p>
-    <a class="button primary small" href="#feedback" data-nav="feedback">填体验问卷</a>
-    <button class="button subtle small" id="survey-later" type="button">稍后</button>
-  </aside>
+  <dialog id="survey-dialog" aria-labelledby="survey-dialog-title" aria-describedby="survey-dialog-note">
+    <header class="dialog-head"><h2 id="survey-dialog-title">这局玩得怎么样？</h2><button type="button" class="icon-button" data-survey-dismiss aria-label="关闭问卷提示">×</button></header>
+    <div class="dialog-content survey-panel">
+      <div class="survey-copy">
+        <p id="survey-dialog-note">想听听你对刚才竞拍的感受。可以现在填，也可以回到结算页稍后再填。</p>
+        <div class="survey-actions">
+          <a class="button primary" href="https://v.wjx.cn/vm/Q3eAPsc.aspx" target="_blank" rel="noopener" data-survey-open>填写体验问卷</a>
+          <button type="button" class="button subtle" data-survey-dismiss autofocus>稍后填写</button>
+        </div>
+      </div>
+      <figure class="survey-code"><img src="assets/experience-survey.png?v=26" width="281" height="280" loading="lazy" alt="问卷星体验与反馈问卷二维码">
+        <figcaption>也可用手机扫码填写。</figcaption></figure>
+    </div>
+  </dialog>
 </body>
 </html>
