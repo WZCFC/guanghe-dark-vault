@@ -58,6 +58,22 @@ test('scenarios expose four entries and charge a selected entry exactly once', (
   assert.equal(expired.report.entryFee, advanced.fee);
 });
 
+test('computer bids respect remaining chips, can pass, and keep the old rules for a saved run', () => {
+  let { state } = act(game.createState(), 'start');
+  state.run.lots[0].bids = [700, 0, 0];
+  ({ state } = act(state, 'pass'));
+  assert.equal(state.run.outcomes[0].winner, '铁哨');
+  assert.deepEqual(game.rivalBalances(state.run), [20, 720, 720]);
+  ({ state } = act(state, 'continue'));
+  const lot = state.run.lots[1];
+  lot.bids = [lot.reserve, 0, 0];
+  const legacy = act({ ...state, run: { ...state.run, rivalBudgeted: undefined } }, 'pass').state;
+  assert.equal(legacy.run.outcomes[1].winner, '铁哨');
+  ({ state } = act(state, 'pass'));
+  assert.deepEqual(state.run.outcomes[1].bids, [0, 0, 0]);
+  assert.equal(state.run.outcomes[1].winner, null);
+});
+
 test('paid and free scenarios use one daily participation quota', () => {
   let state = { ...game.createState(), wallet: 100 };
   for (const [index, scenario] of game.SCENARIOS.slice(0, 3).entries()) {

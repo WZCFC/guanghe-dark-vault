@@ -44,7 +44,7 @@
     const invite = location.hash.match(/^#online\/([a-f0-9]{8})$/i)?.[1]?.toUpperCase() ?? '';
     return `<article class="panel online-card">
       <h2>真人暗标</h2>
-      <p class="online-summary">同一批货箱 · 3 轮 · 独立筹码</p>
+      <p class="online-summary">可直接以游客身份联机。快速匹配需要另一位玩家同时排队，约好朋友可以直接开好友房。</p>
       <div class="online-actions">
         <button type="button" class="button primary" data-online="quick">快速匹配</button>
         <button type="button" class="button subtle" data-online="create">创建好友房</button>
@@ -59,6 +59,9 @@
   function lobby(snapshot) {
     return `<h2>${snapshot.mode === 'quick' ? '正在寻找另一位玩家' : '好友房'} <span class="mono online-code">${safe(snapshot.code)}</span></h2>
       <p class="online-summary">${snapshot.players.length} / ${snapshot.capacity} 人${snapshot.mode === 'private' ? ' · 至少两人开局' : ' · 匹配后自动开局'}</p>
+      ${snapshot.players.length < 2 ? `<p class="online-summary">${snapshot.mode === 'private'
+        ? '把邀请链接发给朋友。对方打开链接后点击「加入房间」，满两人后由房主开始。'
+        : '正在等另一位真人。朋友可在同一站点点击「快速匹配」，或返回大厅创建好友房。'}</p>` : ''}
       <div class="online-actions">
         ${snapshot.mode === 'private' ? '<button class="button subtle" type="button" data-online="copy">复制邀请链接</button>' : ''}
         ${snapshot.mode === 'private' && snapshot.selfSeat === snapshot.hostSeat
@@ -208,6 +211,7 @@
     try {
       const response = await fetch('/api/rooms', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(8000),
         body: JSON.stringify({ action, token, code, ...options }),
         signal: AbortSignal.timeout(9000),
       });

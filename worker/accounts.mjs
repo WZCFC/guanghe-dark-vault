@@ -95,6 +95,9 @@ async function accountGameAction(db, session, action) {
     const now = Date.now();
     const row = await getAccount(db, session, now);
     if (!row) return accountResponse({ message: '登录已过期，请重新登录。' }, 401);
+    if (action.expectedUsername !== undefined && action.expectedUsername !== row.username) {
+      return accountResponse({ message: '账号已在另一个页面切换，请刷新后重试。' }, 409);
+    }
     let result = game.reduce(JSON.parse(row.state), action, { now });
     if (result.effect === 'settled' && accountOutsidePlay.has(action.type)) {
       result = { ...game.reduce(result.state, action, { now }), changed: true };

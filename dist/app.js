@@ -28,9 +28,10 @@
   let accountName = null;
   let clockSkew = 0;
   let accountPending = false;
+  let accountMode = 'login';
   const accountMarker = 'guanghe-account-active';
   let sessionExpected = false;
-  try { sessionExpected = localStorage.getItem(accountMarker) === '1'; } catch {}
+  try { sessionExpected = Boolean(localStorage.getItem(accountMarker)); } catch {}
   const gameNow = () => Date.now() + (accountName ? clockSkew : 0);
 
   async function accountRequest(path = '', data) {
@@ -51,7 +52,7 @@
     clockSkew = snapshot.now - Date.now();
     sessionExpected = Boolean(accountName);
     try {
-      if (sessionExpected) localStorage.setItem(accountMarker, '1');
+      if (sessionExpected) localStorage.setItem(accountMarker, accountName);
       else localStorage.removeItem(accountMarker);
     } catch {}
     state = accountName ? snapshot.state : readState();
@@ -67,7 +68,7 @@
 
   function setAccountPending(pending) {
     accountPending = pending;
-    document.querySelectorAll('#account-form button, #account-logout').forEach(button => { button.disabled = pending; });
+    document.querySelectorAll('#account-form button, #account-logout, [data-account-mode]').forEach(button => { button.disabled = pending; });
   }
 
   async function syncAccount() {
@@ -77,7 +78,7 @@
       const snapshot = await accountRequest();
       if (snapshot.username || accountName || sessionExpected) applySession(snapshot);
     } catch (error) {
-      if (sessionExpected) $('#account-status').textContent = error.message;
+      $('#account-status').textContent = error.message;
     } finally { setAccountPending(false); }
   }
 
@@ -130,7 +131,7 @@
     busy = true;
     const oldState = state;
     try {
-      const result = accountName ? await accountRequest('/action', action) : await underLock(() => {
+      const result = accountName ? await accountRequest('/action', { ...action, expectedUsername: accountName }) : await underLock(() => {
         const now = Date.now();
         const latest = readState(now);
         let result = game.reduce(latest, action, { now });
@@ -202,6 +203,11 @@
   }
 
   function renderHome() {
+    if (accountName) {
+      $('#account-wallet').textContent = view.amount(state.wallet);
+      $('#account-collection').textContent = view.amount(state.collection.length);
+      $('#account-finished').textContent = view.amount(state.finished);
+    }
     const now = gameNow();
     const focused = document.activeElement;
     const recover = focused?.matches('#main button[data-action]') && focused;
@@ -228,6 +234,7 @@
   function refreshAfk(now) {
     const bank = game.afkStatus(state, now);
     const total = bank.claimable + bank.bonus;
+    if (accountName && screen === 'account') $('#account-supply').textContent = view.amount(total);
     const claimable = bank.claimable > 0;
     const destination = claimable ? '#afk' : '#supply';
     if (supplyNav.hash !== destination) {
@@ -955,8 +962,20 @@
   $('#account-form').addEventListener('submit', event => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
-    void submitAccount(event.submitter?.value ?? 'login', data);
+    void submitAccount(accountMode, data);
   });
+  document.querySelectorAll('[data-account-mode]').forEach(button => button.addEventListener('click', () => {
+    accountMode = button.dataset.accountMode;
+    const registering = accountMode === 'register';
+    for (const option of document.querySelectorAll('[data-account-mode]')) option.setAttribute('aria-pressed', String(option === button));
+    $('#account-password').autocomplete = registering ? 'new-password' : 'current-password';
+    $('#account-form-hint').textContent = registering
+      ? '注册只需 2–24 位用户名和至少 8 位的密码。'
+      : '输入注册时使用的用户名和密码。';
+    $('#account-submit').textContent = registering ? '注册并开始新存档' : '登录并读取存档';
+    $('#account-status').textContent = '';
+    $('#account-name').focus();
+  }));
   $('#account-logout').addEventListener('click', () => void submitAccount('logout', {}));
 
   state = readState();

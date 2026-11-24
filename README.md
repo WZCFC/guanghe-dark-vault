@@ -1,11 +1,14 @@
 # 暗仓竞拍 · 光核实践活动
 
-**[点开直接玩 · GitHub Pages](https://wzcfc.github.io/guanghe-dark-vault/)**  
-[完整在线版 · 账号、真人房与讨论](https://guanghe-dark-vault.fc545123.chatgpt.site/)
+**[GitHub Pages 单人试玩](https://wzcfc.github.io/guanghe-dark-vault/)**
 
-GitHub Pages 提供单人竞拍、新手教程、离线补给、老虎机、商店和收藏室。试玩进度保存在当前浏览器。账号、真人房和公开讨论入口会打开完整在线版。问卷可以在 GitHub Pages 试玩后直接打开问卷星。
+[完整在线版](https://guanghe-dark-vault.fc545123.chatgpt.site/) · [备用在线测试站](https://guanghe-dark-vault-preview-nov23.pages.dev/)
 
-此仓库来自 v25 源码快照 `f31522f93a98173bada15e767e5274485d616d8f`。运行 `node scripts/build-github-pages.mjs <全新的输出目录>` 可重建 Pages 文件。`gh-pages` 分支用于发布，`main` 保留网站源码、Worker 和数据库迁移。
+GitHub 只保存当前浏览器的单人游客进度。真人房间和账号存档由在线站提供。原站和备用站的账号、进度和房间独立，约局时请分享同一个站点的邀请链接。
+
+`main` 保留完整源码，`gh-pages` 托管静态试玩。运行 `node scripts/build-github-pages.mjs <全新的输出目录>` 生成发布文件。
+
+单人竞拍的电脑对手使用公开估价和各自的出价偏好。三名对手与玩家以相同的档位筹码开局，只有竞得货箱的对手扣款。白栈前三轮最多花掉起始筹码的约 65%，纸鸢可能观望，余额不足起拍价也会放弃。
 
 公开站的账号使用用户名和密码注册。登录后的单人进度及离线补给由服务端保存，能在另一浏览器用同一账号续玩。游客档仍保存在原浏览器。新手教程的练习局使用独立进度。体验问卷可从首页或对局结算进入，二维码和填写按钮都指向问卷星。首次完成正式对局后会弹出邀请，同一浏览器只自动提醒一次。完整站点构建需包含 `drizzle/0002_accounts.sql`。
 

@@ -72,9 +72,9 @@
     { level: 5, coins: 180, permits: 2 },
   ]);
   const RIVALS = [
-    { name: '铁哨', style: '看重货值', mark: '哨' },
-    { name: '纸鸢', style: '偏好低价', mark: '鸢' },
-    { name: '白栈', style: '起伏较大', mark: '栈' },
+    { name: '铁哨', style: '跟着公开估价出价', mark: '哨' },
+    { name: '纸鸢', style: '只捡折价货', mark: '鸢' },
+    { name: '白栈', style: '把筹码留到后两轮', mark: '栈' },
   ];
   const CATALOG = [
     ['A-07', '退役航测箱', '海岸测绘站', '防震扣完整，底部有盐蚀', 80, 50, 430, ['老化定位模组', '便携水平仪', '航测镜组', '双轴航姿陀螺', '潮汐星历镜', '精密星位仪']],
@@ -291,15 +291,15 @@
     const minFraction = [0, 0.34, 0.73][tier];
     const maxFraction = [0.32, 0.72, 1][tier];
     const spread = high - low;
-    // Divide each old estimate band using its existing value roll. Total, bids and RNG order stay aligned.
+    // Keep the value and scan rolls at the same positions in the deal.
     const valueRoll = random();
     const value = roundTen(low + spread * (minFraction + valueRoll * (maxFraction - minFraction)));
     const appraisal = low + spread * 0.40;
-    const bids = [
-      roundTen(appraisal * (0.75 + random() * 0.55)),
-      roundTen(reserve + (appraisal - reserve) * (0.20 + random() * 0.65)),
-      roundTen(appraisal * (0.40 + random() * 1.03)),
-    ].map(bid => Math.max(reserve, bid));
+    const iron = roundTen(appraisal * (0.80 + random() * 0.43));
+    const paperRoll = random();
+    const paper = roundTen(reserve + (appraisal - reserve) * (0.15 + paperRoll * 0.50));
+    const white = roundTen(appraisal * ((late ? 0.63 : 0.40) + random() * 0.90));
+    const bids = [Math.max(reserve, iron), paperRoll < 0.20 ? 0 : paper, white >= reserve ? white : 0];
     return {
       id, name, source, seal, reserve, low, high, value, bids, scanned: false,
       scanLow: Math.max(low, value - 20 - roundTen(random() * 50)),
@@ -318,6 +318,7 @@
     state.run = {
       id: displayTag(state.started), startedAt: now, expiresAt: now + DURATION,
       scenarioId: scenario.id, entryFee: scenario.fee,
+      rivalBudgeted: true,
       index: 0, phase: 'auction', scans: 2, spent: 0, cargo: [], seized: [],
       lots: shuffled.slice(0, ROUNDS).map((template, index) => makeLot(template, random, index, scenario)),
       outcomes: [], checkpoint: null, recovered: 0,
@@ -416,9 +417,20 @@
     return report;
   }
 
+  function rivalBalances(run) {
+    const initial = findScenario(run.scenarioId).chips;
+    return RIVALS.map(({ name }, index) => initial - run.outcomes.reduce((spent, outcome) =>
+      spent + (outcome.winner === name ? outcome.bids[index] : 0), 0));
+  }
+
   function reveal(run, bid) {
     const lot = run.lots[run.index];
-    const highest = Math.max(...lot.bids);
+    const bids = run.rivalBudgeted ? rivalBalances(run).map((remaining, index) => {
+      const reserveForLater = index === 2 && run.index < 3 ? Math.floor(findScenario(run.scenarioId).chips * 0.35 / 10) * 10 : 0;
+      const affordable = Math.min(lot.bids[index], remaining - reserveForLater);
+      return affordable >= lot.reserve ? affordable : 0;
+    }) : lot.bids;
+    const highest = Math.max(...bids);
     const won = bid !== null && bid > highest;
     if (won) {
       run.spent += bid;
@@ -427,7 +439,7 @@
     run.outcomes.push({
       lotId: lot.id, name: lot.name, contents: lot.contents, value: lot.value, reserve: lot.reserve,
       items: boxItems(lot).map(({ name, value, quality }) => ({ name, value, quality })),
-      bid, bids: lot.bids, winner: won ? '你' : RIVALS[lot.bids.indexOf(highest)].name, won,
+      bid, bids, winner: won ? '你' : highest ? RIVALS[bids.indexOf(highest)].name : null, won,
     });
     run.phase = 'decision';
   }
@@ -596,7 +608,7 @@
     AFK_INTERVAL, AFK_COINS, AFK_LIMIT, AFK_CAP, AFK_DAILY_CAP, AFK_RANKS, AFK_CARD_STEP, afkStatus,
     SCRATCH_REWARDS, SLOT_COST, SLOT_PAYOUTS, SLOT_SYMBOLS,
     SAVE_VERSION, PARTICIPATION_AWARDS, PARTICIPATION_BID_STEP, CHIPS_PER_PROFIT_COIN, PROFIT_COIN_CAP, RISK, LATE_RECOVERY,
-    RIVALS, MILESTONES, SHOP_ITEMS, GRADES, COLLECTION_ITEMS, createState, dayKey, turnToken, chipsLeft, cargoValue, nextRisk,
+    RIVALS, rivalBalances, MILESTONES, SHOP_ITEMS, GRADES, COLLECTION_ITEMS, createState, dayKey, turnToken, chipsLeft, cargoValue, nextRisk,
     boxItems, restoreCollection, restoreState, participationBidFloor, participationProgress, participationStatus,
     nextRecoveryRate, runNet, SCENARIOS, findScenario, redChance, isRedeemable, reduce,
   };

@@ -362,11 +362,12 @@
   }
 
   function revealResult(outcome, lastRound = false) {
-    const result = outcome.won ? 'won' : outcome.bid === null ? 'passed' : 'lost';
+    const result = outcome.won ? 'won' : outcome.winner === null ? 'unsold' : outcome.bid === null ? 'passed' : 'lost';
     const [symbol, label, detail] = {
       won: ['✓', '竞得货箱', `已加入到手货箱 · 扣除 ${amount(outcome.bid)} 筹码`],
       lost: ['×', '未竞得', `${safe(outcome.winner)}以 ${amount(Math.max(...outcome.bids))} 筹码竞得 · 本轮未扣筹码`],
       passed: ['−', '已放弃', `${safe(outcome.winner)}竞得 · 本轮未扣筹码`],
+      unsold: ['−', '货箱流拍', '本轮无人出价'],
     }[result];
     const heading = lastRound ? `<h4>第 ${game.ROUNDS} 轮 · ${label}</h4>` : `<h3 data-stage-title tabindex="-1">${label}</h3>`;
     return `<div class="reveal-result" data-result="${result}"><span class="reveal-mark" aria-hidden="true">${symbol}</span>
@@ -391,7 +392,7 @@
       : `还需${participationSteps(progress, run.legacyEconomy)}，结算后才算有效对局。`;
     return `<div class="reveal">
       ${revealResult(outcome)}
-      <dl class="reveal-data"><div><dt>全箱真实估值</dt><dd class="mono">${outcome.value}</dd></div><div><dt>你的出价</dt><dd class="mono">${outcome.bid === null ? '放弃' : outcome.bid}</dd></div><div><dt>电脑最高价</dt><dd class="mono">${rivalPrice}</dd></div></dl>
+      <dl class="reveal-data"><div><dt>全箱真实估值</dt><dd class="mono">${outcome.value}</dd></div><div><dt>你的出价</dt><dd class="mono">${outcome.bid === null ? '放弃' : outcome.bid}</dd></div><div><dt>电脑最高价</dt><dd class="mono">${rivalPrice || '未出价'}</dd></div></dl>
       ${revealedItems(outcome.items)}
     </div><div class="decision"><h3 class="decision-title" data-help-topic="risk" data-help-detail="${safe(rewardSummary(state, now))}">撤离还是继续？</h3>
       <div class="decision-actions decision-fork">
@@ -419,6 +420,7 @@
     const { run } = state;
     const total = game.cargoValue(run);
     const resolved = run.phase === 'decision' ? run.outcomes[run.outcomes.length - 1] : null;
+    const budgets = run.rivalBudgeted ? game.rivalBalances(run) : null;
     return `<aside class="run-side" aria-label="货物与电脑竞价员">
       <section class="panel"><div class="panel-head"><h3>到手货箱</h3><span class="annot">${run.cargo.length} 箱 · 扣留 ${run.seized.length} 箱</span></div>
         <div class="stash-body"><dl class="stash-totals"><div><dt>当前货值</dt><dd>${amount(total)}</dd></div><div><dt>已付成本</dt><dd>${amount(run.spent)}</dd></div>
@@ -428,7 +430,7 @@
           ${run.cargo.length ? '' : '<p class="stash-help">竞得的货物会显示在这里。</p>'}</div>
       </section>
       <section class="panel"><div class="panel-head"><h3>电脑竞价员</h3><span class="annot">${resolved ? '已揭标' : '报价封存'}</span></div>
-        <ul class="rivals-list">${game.RIVALS.map((rival, index) => `<li><span class="avatar" aria-hidden="true">${rival.mark}</span><div><strong>${rival.name}</strong><small>${rival.style}</small></div><span class="mono">${resolved ? resolved.bids[index] : '···'}</span></li>`).join('')}</ul>
+        <ul class="rivals-list">${game.RIVALS.map((rival, index) => `<li><span class="avatar" aria-hidden="true">${rival.mark}</span><div><strong>${rival.name}</strong><small>${budgets ? rival.style + ' · 剩 ' + amount(budgets[index]) : '按开局规则出价'}</small></div><span class="mono">${resolved ? resolved.bids[index] || '观望' : '···'}</span></li>`).join('')}</ul>
       </section>
     </aside>`;
   }
@@ -487,7 +489,7 @@
     const totals = [['带出货值', report.gross], ['盘查返还', report.recovered ?? 0], ['竞拍成本', report.spent]];
     const cargo = report.cargo.map(item => `<li><span>${safe(item.name)}</span><strong>${item.value}</strong></li>`);
     const seized = report.seized.map(item => `<li><span>${safe(item.name)}（盘查扣留）</span><strong class="negative">未带出</strong></li>`);
-    const rounds = report.outcomes.length ? `<details class="history-detail"><summary>逐轮复盘</summary><ol class="round-history">${report.outcomes.map((round, index) => `<li><strong>第 ${index + 1} 轮 · ${safe(round.name)}</strong><br>全箱估值 ${round.value}，你的暗标 ${round.bid ?? '放弃'}，${safe(round.winner)}竞得。${revealedItems(round.items)}</li>`).join('')}</ol></details>` : '';
+    const rounds = report.outcomes.length ? `<details class="history-detail"><summary>逐轮复盘</summary><ol class="round-history">${report.outcomes.map((round, index) => `<li><strong>第 ${index + 1} 轮 · ${safe(round.name)}</strong><br>全箱估值 ${round.value}，你的暗标 ${round.bid ?? '放弃'}，${round.winner === null ? '货箱流拍' : safe(round.winner) + '竞得'}。${revealedItems(round.items)}</li>`).join('')}</ol></details>` : '';
     const seconds = Math.floor(report.duration / 1000);
     const duration = `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒`;
     const unlocks = report.newUnlocks?.length ? unlockDisplay(report.newUnlocks) : '';

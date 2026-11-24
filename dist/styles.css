@@ -323,6 +323,11 @@ main.shell { flex: 1 0 auto; }
 }
 .account-panel .discussion-form, .account-panel #account-guest { max-width: 480px; }
 #account-status, #practice-error { color: var(--blue); font-size: 14px; }
+.account-modes button[aria-pressed="true"] { color: var(--active-text); background: var(--active-bg); border-color: var(--active-bg); }
+.account-save-summary { display: grid; grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); gap: 8px; margin: 4px 0; }
+.account-save-summary div { background: var(--tinted); padding: 8px 10px; }
+.account-save-summary dt { color: var(--muted); font-size: 13px; }
+.account-save-summary dd { margin: 0; font-weight: 750; }
 .account-panel p:not(:empty) { margin-block: 5px 10px; }
 .practice-panel { display: grid; gap: 10px; border-top: 3px solid var(--blue); }
 .practice-panel > button { justify-self: start; }
