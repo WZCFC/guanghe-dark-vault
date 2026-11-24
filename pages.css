@@ -5,5 +5,6 @@
   color: var(--text); background: var(--tinted); border-inline-start: 3px solid var(--blue);
 }
 .pages-services a { color: var(--blue); font-weight: 700; }
+.pages-online-links { display: flex; flex-wrap: wrap; gap: 6px 14px; }
 #account-guest, #account-signed-in, #account-status, #save-scope,
 .battle-hook, [data-action="discuss-report"] { display: none; }

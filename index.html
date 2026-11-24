@@ -38,15 +38,15 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=26">
-  <script src="game.js?v=18" defer></script>
-  <script src="views.js?v=24" defer></script>
+  <link rel="stylesheet" href="styles.css?v=27">
+  <script src="game.js?v=27" defer></script>
+  <script src="views.js?v=27" defer></script>
   <script src="guide.js?v=21" defer></script>
   <script src="sound.js?v=25" defer></script>
   <script src="feedback-fx.js?v=25" defer></script>
   <script src="survey.js?v=26" defer></script>
-  <script src="app.js?v=26" defer></script>
-  <script src="welcome.js?v=26" defer></script>
+  <script src="app.js?v=27" defer></script>
+  <script src="welcome.js?v=27" defer></script>
   <link rel="stylesheet" href="pages.css?v=25">
 </head>
 <body>
@@ -81,8 +81,12 @@
 
   <main id="main" tabindex="-1" class="shell">
     <aside class="pages-services" aria-label="试玩版本">
-      <span>GitHub 试玩 · 单人进度保存在当前浏览器</span>
-      <a class="text-button" href="https://guanghe-dark-vault.fc545123.chatgpt.site/">完整在线版</a>
+      <span>GitHub 单人试玩 · 游客进度保存在当前浏览器</span>
+      <div class="pages-online-links">
+        <a class="text-button" href="https://guanghe-dark-vault.fc545123.chatgpt.site/#online">真人联机</a>
+        <a class="text-button" href="https://guanghe-dark-vault.fc545123.chatgpt.site/#account">账号存档</a>
+        <a class="text-button" href="https://guanghe-dark-vault-preview-nov23.pages.dev/#online" title="备用测试站使用独立账号与房间">备用联机站</a>
+      </div>
     </aside>
     <section id="home" tabindex="-1" aria-labelledby="hero-title">
       <div class="hero">
@@ -178,7 +182,8 @@
           <div class="play-section-actions"><a class="text-button section-link" href="#arena" data-nav="arena">单人竞拍</a>
             <button data-sound-toggle class="button subtle small" type="button" aria-pressed="false" hidden>开启声音</button></div>
         </div>
-        <div id="online-board" class="pages-services"><a class="button primary" href="https://guanghe-dark-vault.fc545123.chatgpt.site/#online">前往真人竞拍</a></div>
+        <div id="online-board" class="pages-services"><span>和朋友使用同一个站点的邀请链接。</span><a class="button primary" href="https://guanghe-dark-vault.fc545123.chatgpt.site/#online">前往真人竞拍</a>
+  <a class="button subtle" href="https://guanghe-dark-vault-preview-nov23.pages.dev/#online">备用联机站</a></div>
         <p id="online-status" class="online-status" role="status"></p>
       </section>
 
@@ -314,22 +319,29 @@
 
       <section id="account" class="section" hidden tabindex="-1" aria-labelledby="account-heading">
         <div class="section-head"><h1 id="account-heading">账号存档</h1><span id="save-scope" class="collection-count">游客存档</span></div>
-        <article class="panel account-panel"><a class="button primary" href="https://guanghe-dark-vault.fc545123.chatgpt.site/#account">前往在线账号</a>
+        <article class="panel account-panel"><p>GitHub 游客档保存在这个浏览器。登录账号可在完整站换设备继续。</p><a class="button primary" href="https://guanghe-dark-vault.fc545123.chatgpt.site/#account">前往在线账号</a>
           <div id="account-guest">
-            <p>用同一账号可以在不同浏览器续玩。账号与这个浏览器的游客档各自保存。</p>
+            <p>登录后，光核币、道具、收藏、单人战报和离线补给都会保存到账号。同一站点换设备登录也能续玩。</p>
+            <div class="discussion-actions account-modes" role="group" aria-label="账号操作">
+              <button type="button" class="button subtle" data-account-mode="login" aria-pressed="true">登录已有账号</button>
+              <button type="button" class="button subtle" data-account-mode="register" aria-pressed="false">创建新账号</button>
+            </div>
             <form id="account-form" class="discussion-form">
               <label for="account-name">用户名</label>
               <input id="account-name" name="username" minlength="2" maxlength="24" autocomplete="username" required>
               <label for="account-password">密码</label>
               <input id="account-password" name="password" type="password" minlength="8" maxlength="80" autocomplete="current-password" required>
-              <p class="form-note">用户名 2–24 位，密码至少 8 位。注册只需这两项。</p>
-              <div class="discussion-actions"><button type="submit" class="button primary" name="account-action" value="login">登录</button>
-                <button type="submit" class="button subtle" name="account-action" value="register">注册并登录</button></div>
+              <p id="account-form-hint" class="form-note">输入注册时使用的用户名和密码。</p>
+              <div class="discussion-actions"><button type="submit" class="button primary" id="account-submit">登录并读取存档</button>
+                <a class="button subtle" href="#home" data-nav="home">以游客继续</a></div>
             </form>
+            <p class="form-note">游客进度留在当前浏览器。新账号有独立存档，退出登录即可回到游客档。</p>
           </div>
           <div id="account-signed-in" hidden>
             <p>已登录 <strong id="account-username"></strong></p>
-            <p>游玩进度会保存到账号，离线补给关页后继续累计。</p>
+            <p>进度已载入。接下来的单人游玩和领奖都会写入这个账号。</p>
+            <dl class="account-save-summary"><div><dt>光核币</dt><dd id="account-wallet"></dd></div><div><dt>已解锁藏品</dt><dd id="account-collection"></dd></div>
+              <div><dt>已结算对局</dt><dd id="account-finished"></dd></div><div><dt>可领离线补给</dt><dd id="account-supply"></dd></div></dl>
             <div class="discussion-actions"><a class="button primary" href="#arena" data-nav="arena">回竞拍台</a>
               <a class="button subtle" href="#afk" data-nav="afk">查看离线补给</a><button class="button subtle" type="button" id="account-logout">退出登录</button></div>
           </div>

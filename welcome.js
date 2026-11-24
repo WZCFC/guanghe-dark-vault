@@ -57,7 +57,7 @@
       const round = run.outcomes.at(-1);
       title = '揭标后决定去留';
       step = 3;
-      body = `<p><strong>${round.won ? '你竞得货箱' : round.bid == null ? '你放弃了货箱' : '电脑竞得货箱'}</strong>。货箱实际值 ${round.value} 筹码，电脑最高价 ${Math.max(...round.bids)}。</p>
+      body = `<p><strong>${round.won ? '你竞得货箱' : round.winner === null ? '货箱流拍' : round.bid == null ? '你放弃了货箱' : '电脑竞得货箱'}</strong>。货箱实际值 ${round.value} 筹码，电脑最高价 ${Math.max(...round.bids) || '未出价'}。</p>
         <div class="decision-actions decision-fork">
           <div><span>现在撤离</span><p>净收益 ${signed(game.runNet(run))} 筹码</p><button class="button primary" type="button" data-practice="extract">撤离结算</button></div>
           <div><span>继续搜仓</span><p>${game.nextRisk(run) ? `下一轮盘查概率 ${game.nextRisk(run)}%` : '空手继续没有盘查'}。</p><button class="button subtle" type="button" data-practice="continue">继续搜仓</button></div>
