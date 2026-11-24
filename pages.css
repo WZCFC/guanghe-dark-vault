@@ -5,5 +5,5 @@
   color: var(--text); background: var(--tinted); border-inline-start: 3px solid var(--blue);
 }
 .pages-services a { color: var(--blue); font-weight: 700; }
-#account-guest, #account-signed-in, #account-status, #save-scope, #experience-survey,
+#account-guest, #account-signed-in, #account-status, #save-scope,
 .battle-hook, [data-action="discuss-report"] { display: none; }

@@ -510,7 +510,7 @@
         <ul class="settlement-list">${cargo.concat(seized).join('')}</ul>
         ${rounds}
         ${discuss ? `<section class="battle-hook"><div><h4>这局最值得聊的一箱</h4><p>${safe(discuss.title)}</p></div><button type="button" class="button subtle" data-action="discuss-report" data-id="${safe(report.id)}">带这局去讨论</button></section>` : ''}
-        <div class="settle-actions"><button type="button" class="button primary" data-action="choose-scenario">选择场景再开一局 <span aria-hidden="true">→</span></button>${share}<a href="#collection" data-nav="collection" class="button subtle">查看收藏室</a><a href="#supply" data-nav="supply" class="button subtle">查看活动补给</a><a href="#community" data-nav="community" class="button subtle">去交流站复盘</a>${report.rounds ? '<a href="https://guanghe-dark-vault.fc545123.chatgpt.site/#feedback" class="button subtle">体验问卷</a>' : ''}</div>
+        <div class="settle-actions"><button type="button" class="button primary" data-action="choose-scenario">选择场景再开一局 <span aria-hidden="true">→</span></button>${share}<a href="#collection" data-nav="collection" class="button subtle">查看收藏室</a><a href="#supply" data-nav="supply" class="button subtle">查看活动补给</a><a href="#community" data-nav="community" class="button subtle">去交流站复盘</a>${report.rounds ? '<a href="#feedback" data-nav="feedback" class="button subtle">体验问卷</a>' : ''}</div>
       </div></article>`;
   }
 

@@ -322,7 +322,7 @@ main.shell { flex: 1 0 auto; }
   max-width: 890px; padding: clamp(13px, 3vw, 24px);
 }
 .account-panel .discussion-form, .account-panel #account-guest { max-width: 480px; }
-#account-status, #survey-status, #practice-error { color: var(--blue); font-size: 14px; }
+#account-status, #practice-error { color: var(--blue); font-size: 14px; }
 .account-panel p:not(:empty) { margin-block: 5px 10px; }
 .practice-panel { display: grid; gap: 10px; border-top: 3px solid var(--blue); }
 .practice-panel > button { justify-self: start; }
@@ -336,19 +336,12 @@ main.shell { flex: 1 0 auto; }
 .handbook details { padding-block: 9px; border-bottom: 1px solid var(--line); }
 .handbook summary { color: var(--blue); cursor: pointer; font-weight: 700; }
 .handbook p { margin-top: 5px; color: var(--muted); max-width: 70ch; }
-.survey-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 230px); align-items: start; gap: 14px; }
-.survey-panel form { margin: 0; }
-.survey-panel fieldset { border: 0; padding: 0; min-width: 0; }
-.survey-panel legend { font-weight: 750; }
-.survey-rating { display: flex; flex-wrap: wrap; gap: 4px 8px; }
-.survey-rating label { display: flex; align-items: center; gap: 3px; min-height: 40px; }
-.survey-rating input { width: auto; accent-color: var(--blue); }
-.survey-panel select { min-height: 42px; width: 100%; color: var(--text); background: var(--field); border: 1px solid var(--control-border); padding: 6px; }
+.survey-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 230px); align-items: center; gap: 18px; }
+.survey-copy { display: grid; gap: 12px; justify-items: start; }
+.survey-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .survey-code { display: grid; justify-items: center; gap: 5px; margin: 0; text-align: center; }
-.survey-code img { display: block; width: 180px; max-width: 100%; height: auto; image-rendering: pixelated; background: white; }
+.survey-code img { display: block; width: 180px; max-width: 100%; height: auto; background: white; }
 .survey-code figcaption { color: var(--muted); font-size: 13px; }
-.survey-nudge { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 9px; margin-block: 6px 10px; border-inline-start: 3px solid var(--blue); }
-.survey-nudge p { font-size: 13px; flex: 1 1 160px; }
 @media (max-width: 620px) { .survey-panel { grid-template-columns: minmax(0,1fr); } }
 @media (prefers-reduced-motion: no-preference) {
   .is-revealing .reveal-gain { animation: cargo-arrival .27s ease-out .12s both; }
